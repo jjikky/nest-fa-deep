@@ -1,8 +1,8 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { PrimaryGeneratedColumn } from 'typeorm';
+import { IsUUID } from 'class-validator';
 
 export class FindUserReqDto {
   @ApiProperty({ required: true })
-  @PrimaryGeneratedColumn('uuid')
+  @IsUUID()
   id: string;
 }
