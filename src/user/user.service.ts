@@ -16,10 +16,10 @@ export class UserService {
   }
 
   async create(email: string, password: string) {
-    return 'create user';
+    return this.userRepository.save({ email, password });
   }
 
   async findOneByEmail(email: string) {
-    return 'find user by email';
+    return this.userRepository.findOneBy({ email });
   }
 }
