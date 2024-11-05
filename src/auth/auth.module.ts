@@ -8,6 +8,8 @@ import { JwtStrategy } from './jwt.strategy';
 import { APP_GUARD } from '@nestjs/core';
 import { JwtAuthGuard } from './jwt-auth.guard';
 import { ConfigService } from '@nestjs/config';
+import { RefreshToken } from './entity/refresh-token.entity';
+import { TypeOrmModule } from '@nestjs/typeorm';
 
 @Module({
   imports: [
@@ -23,6 +25,7 @@ import { ConfigService } from '@nestjs/config';
         };
       },
     }),
+    TypeOrmModule.forFeature([RefreshToken]),
   ],
   providers: [
     AuthService,
