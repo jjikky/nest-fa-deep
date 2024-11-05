@@ -9,6 +9,7 @@ import { User } from 'src/common/decorator/user.decorator';
 import { UserAfterAuth } from 'src/common/decorator/user.decorator';
 import { Role } from './enum/user.enum';
 import { Roles } from 'src/common/decorator/role.decorator';
+import { create } from 'domain';
 
 @ApiTags('User')
 @ApiExtraModels(FindUserReqDto, PageReqDto)
@@ -20,8 +21,9 @@ export class UserController {
   @ApiGetItemsResponse(FindUserResDto)
   @Roles(Role.ADMIN)
   @Get()
-  findAll(@Query() { page, size }: PageReqDto, @User() user: UserAfterAuth) {
-    return this.userService.findAll();
+  async findAll(@Query() { page, size }: PageReqDto, @User() user: UserAfterAuth): Promise<FindUserResDto[]> {
+    const users = await this.userService.findAll(page, size);
+    return users.map(({ id, email, createdAt }) => ({ id, email, createdAt: createdAt.toISOString() }));
   }
 
   @ApiBearerAuth()
