@@ -7,9 +7,10 @@ import { ApiGetItemsResponse, ApiGetResponse, ApiPostResponse } from 'src/common
 import { CreateVideoResDto, FindVideoResDto } from './dto/res.dto';
 import { ThrottlerBehindProxyGuard } from 'src/common/guard/throttler-behind-proxy.guard';
 import { SkipThrottle, Throttle } from '@nestjs/throttler';
+import { PageResDto } from 'src/common/dto/res.dto';
 
 @ApiTags('Video')
-@ApiExtraModels(FindVideoReqDto, PageReqDto, CreateVideoResDto, FindVideoResDto)
+@ApiExtraModels(FindVideoReqDto, PageReqDto, CreateVideoResDto, FindVideoResDto, PageResDto)
 @UseGuards(ThrottlerBehindProxyGuard)
 @Controller('api/videos')
 export class VideoController {
