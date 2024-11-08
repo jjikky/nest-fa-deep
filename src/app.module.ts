@@ -27,7 +27,7 @@ import { LoggerMiddleware } from './common/middleware/logger.middleware';
         if (configService.get('STAGE') === 'local') {
           obj = Object.assign(obj, {
             logging: true,
-            synchronize: true,
+            synchronize: false,
           });
         }
         return obj;
