@@ -10,6 +10,7 @@ import jwtConfig from './config/jwt.config';
 import { LoggerMiddleware } from './common/middleware/logger.middleware';
 import swaggerConfig from './config/swagger.config';
 import { ThrottlerModule } from '@nestjs/throttler';
+import { HealthModule } from './health/health.module';
 
 @Module({
   imports: [
@@ -56,6 +57,7 @@ import { ThrottlerModule } from '@nestjs/throttler';
     UserModule,
     VideoModule,
     AnalyticsModule,
+    HealthModule,
   ],
   providers: [Logger],
 })
