@@ -1,10 +1,11 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable, UnauthorizedException } from '@nestjs/common';
 import { UserService } from 'src/user/user.service';
 import { JwtService } from '@nestjs/jwt';
 import { RefreshToken } from './entity/refresh-token.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { DataSource, Repository } from 'typeorm';
 import { User } from 'src/user/entity/user.entity';
+import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class AuthService {
@@ -17,10 +18,6 @@ export class AuthService {
     private refreshTokenRepository: Repository<RefreshToken>,
   ) {}
 
-  async validateUser(email: string, password: string): Promise<any> {
-    return null;
-  }
-
   async signup(email: string, password: string) {
     const queryRunner = this.dataSource.createQueryRunner();
     await queryRunner.connect();
@@ -31,7 +28,9 @@ export class AuthService {
       const user = await this.userService.findOneByEmail(email);
       if (user) throw new BadRequestException();
 
-      const userEntity = queryRunner.manager.create(User, { email, password });
+      const saltRounds = 10;
+      const hashedPassword = await bcrypt.hash(password, saltRounds);
+      const userEntity = queryRunner.manager.create(User, { email, password: hashedPassword });
       await queryRunner.manager.save(userEntity);
 
       const accessToken = this.generateAccessToken(userEntity.id);
@@ -52,11 +51,7 @@ export class AuthService {
   }
 
   async signin(email: string, password: string) {
-    const user = await this.userService.findOneByEmail(email);
-    if (!user) throw new BadRequestException();
-
-    const isMatch = password === user.password;
-    if (!isMatch) throw new BadRequestException();
+    const user = await this.validateUser(email, password);
 
     const refreshToken = this.generateRefreshToken(user.id);
     await this.createRefreshTokenUsingUser(user.id, refreshToken);
@@ -103,5 +98,15 @@ export class AuthService {
       });
       await this.refreshTokenRepository.save(newRefreshToken);
     }
+  }
+
+  private async validateUser(email: string, password: string) {
+    const user = await this.userService.findOneByEmail(email);
+    if (!user) throw new UnauthorizedException();
+
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch) throw new UnauthorizedException();
+
+    return user;
   }
 }
